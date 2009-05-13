@@ -1,0 +1,22 @@
+Source: preprepare
+Section: misc
+Priority: extra
+Maintainer: Dimitri Fontaine <dim@tapoueh.org>
+Build-Depends: debhelper (>= 5.0.0), postgresql-server-dev-8.3, postgresql-server-dev-8.4
+Standards-Version: 3.8.1
+
+Package: postgresql-8.3-preprepare
+Architecture: any
+Depends: ${shlibs:Depends}, postgresql-8.3
+Description: Pre Prepare your Statement server side
+ The +pre_prepare+ module aims to prepare all your statements as soon as
+ possible and in a way that allows client queries not to bother at all and
+ just call EXECUTE.
+
+Package: postgresql-8.4-preprepare
+Architecture: any
+Depends: ${shlibs:Depends}, postgresql-8.4
+Description: Pre Prepare your Statement server side
+ The +pre_prepare+ module aims to prepare all your statements as soon as
+ possible and in a way that allows client queries not to bother at all and
+ just call EXECUTE.

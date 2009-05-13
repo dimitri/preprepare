@@ -1,0 +1,63 @@
+= pre_prepare
+
+== Ideas
+
+The +pre_prepare+ module aims to prepare all your statements as soon as
+possible and in a way that allows client queries not to bother at all and
+just call +EXECUTE+.
+
+== Setup
+
+=== compile and install
+
+The module is using the PG_XS build infrastructure, so just:
+
+  make
+  make install
+  psql -f `pg_config --sharedir`/contrib/pre_prepare.sql -U user dbname
+
+Depending on the way you got PostgreSQL installed in the first place, you
+may need to use sudo for the +make install+ step.
+
+=== postgresql.conf
+
+Add a custom class then the following settings:
+
+  custom_variable_classes = 'preprepare'
+  preprepare.relation = 'preprepare.statements'
+
+The +pre_prepare.relation+ is the name of the table where you'll put all the
+statements you want to module to prepare. The following SQL query against
+the given relation must return the names and SQL statements to be prepared.
+
+  SELECT name, statement FROM <pre_prepare.relation>;
+
+The statements won't be edited, so must be the all PREPARE stuff.
+
+=== pgbouncer
+
+When using pgbouncer, which is a good idea, consider setting up
++connect_query+ to prepare all the statements at server connection time.
+
+  [databases]
+  foo = port=5432 connect_query='SELECT prepare_all();'
+
+Of course, if using +pre_prepare+, you'll want to avoid using +DISCARD ALL+
+as your +reset_query+...
+
+=== local_preload_libraries
+
+It's unfortunately not possible to call +SPI_connect()+ from the module
+initialization routine (+_PG_init()+) when called via
++local_preload_libraries+, it's too much early. So fully transparent
+preparing of user given statement is not possible with the +pre_prepare+
+module, you still have to explicitely call +SELECT prepare_all()+.
+
+== Usage
+
+First create a table where to store your statements, e.g.:
+
+  create table pre_prepare.statements(name text primary key, statement text);
+
+Then connect to PostgreSQL via +pgbouncer+ and run the +EXECUTE+ command
+matching with your +PREPARE+ statements, they all are already prepared.

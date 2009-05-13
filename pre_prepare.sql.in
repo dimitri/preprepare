@@ -1,0 +1,11 @@
+---
+--- pre_prepare exports only a prepare_all() function.
+---
+BEGIN;
+
+CREATE OR REPLACE FUNCTION prepare_all()
+RETURNS void
+AS 'MODULE_PATHNAME', 'prepare_all'
+LANGUAGE 'C' VOLATILE;
+
+COMMIT;

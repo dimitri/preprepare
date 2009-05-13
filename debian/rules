@@ -1,0 +1,52 @@
+#!/usr/bin/make -f
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+	CFLAGS += -O0
+else
+	CFLAGS += -O2
+endif
+
+CFLAGS83 = $(shell /usr/lib/postgresql/8.3/bin/pg_config --cflags)
+PGXS83   = $(shell /usr/lib/postgresql/8.3/bin/pg_config --pgxs)
+
+CFLAGS84 = $(shell /usr/lib/postgresql/8.4/bin/pg_config --cflags)
+PGXS84   = $(shell /usr/lib/postgresql/8.4/bin/pg_config --pgxs)
+
+build:
+
+clean:
+	dh_testdir
+	dh_testroot
+	$(MAKE) clean USE_PGXS=1 PGXS="$(PGXS83)"
+	dh_clean 
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k 
+	dh_installdirs
+
+	$(MAKE) CFLAGS="$(CFLAGS83)" USE_PGXS=1 PGXS="$(PGXS83)"
+	dh_install -ppostgresql-8.3-preprepare
+
+	$(MAKE) CFLAGS="$(CFLAGS84)" USE_PGXS=1 PGXS="$(PGXS84)"
+	dh_install -ppostgresql-8.4-preprepare
+
+binary-indep: build install
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install
