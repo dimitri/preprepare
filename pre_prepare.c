@@ -15,6 +15,7 @@
 #include "utils/palloc.h"
 #include "utils/builtins.h"
 #include "libpq/pqformat.h"
+#include "access/xact.h"
 
 /*
 #define  DEBUG
@@ -29,12 +30,17 @@
 #error "Unknown postgresql version"
 #endif
 
-#if PG_MAJOR_VERSION != 803 && PG_MAJOR_VERSION != 804
+#if PG_MAJOR_VERSION != 803 && PG_MAJOR_VERSION != 804 && PG_MAJOR_VERSION != 805
 #error "Unsupported postgresql version"
+#endif
+
+#if PG_MAJOR_VERSION >= 805
+#include "utils/snapmgr.h"
 #endif
 
 PG_MODULE_MAGIC;
 
+static bool pre_prepare_at_init   = false;
 static char *pre_prepare_relation = NULL;
 
 void _PG_init(void);
@@ -125,6 +131,7 @@ int pre_prepare_all() {
  */
 void
 _PG_init(void) {
+#if PG_MAJOR_VERSION == 803
   DefineCustomStringVariable("preprepare.relation",
 			     "Table name where to find statements to prepare",
 			     "Can be schema qualified, must have columns \"name\" and \"statement\"",
@@ -132,8 +139,67 @@ _PG_init(void) {
 			     PGC_USERSET,
 			     NULL, 
 			     NULL);
-
+#else
+  DefineCustomStringVariable("preprepare.relation",
+			     "Table name where to find statements to prepare",
+			     "Can be schema qualified, must have columns \"name\" and \"statement\"",
+			     &pre_prepare_relation,
+			     "",
+			     PGC_USERSET,
+			     GUC_NOT_IN_SAMPLE,
+			     NULL, 
+			     NULL);
+#endif
   EmitWarningsOnPlaceholders("prepare.relation");
+
+#if PG_MAJOR_VERSION == 805
+  /*
+   * The at_init hook requires PostgreSQL to load its
+   * local_preload_libraries from within a transaction, which ain't the case
+   * before 8.5
+   */
+  DefineCustomBoolVariable("preprepare.at_init",
+			   "Do we prepare the statements at backend start",
+			   "You have to setup local_preload_libraries too",
+			   &pre_prepare_at_init,
+			   false,
+			   PGC_USERSET,
+			   GUC_NOT_IN_SAMPLE,
+			   NULL,
+			   NULL);
+
+  if( pre_prepare_at_init ) {
+    int err;
+
+    /*
+     * Connecting to SPI requires having opened a transaction and
+     * initialized its memory context.
+     */
+    Snapshot snapshot;
+    CommandCounterIncrement();
+    snapshot = GetTransactionSnapshot();
+    PushActiveSnapshot(snapshot);
+
+    err = SPI_connect();
+    if (err != SPI_OK_CONNECT)
+      elog(ERROR, "SPI_connect: %s", SPI_result_code_string(err));
+    
+    if( ! check_pre_prepare_relation() ) {
+      ereport(ERROR,
+	      (errcode(ERRCODE_DATA_EXCEPTION),
+	       errmsg("Can not find relation '%s'", pre_prepare_relation),
+	       errhint("Set preprepare.relation to an existing table.")));
+    }
+    
+    pre_prepare_all(false);
+    
+    err = SPI_finish();
+    if (err != SPI_OK_FINISH)
+      elog(ERROR, "SPI_finish: %s", SPI_result_code_string(err));
+
+    PopActiveSnapshot();
+  }
+#endif
 }
 
 /*
