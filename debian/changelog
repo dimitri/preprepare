@@ -1,3 +1,10 @@
+preprepare (0.2-1) unstable; urgency=low
+
+  * Add support for local_preload_libraries and preprepare.at_init = on
+    for PostgreSQL 8.4 and following
+
+ -- Dimitri Fontaine <dim@tapoueh.org>  Tue, 07 Jul 2009 09:58:08 +0200
+
 preprepare (0.1-1) unstable; urgency=low
   
   * Initial release

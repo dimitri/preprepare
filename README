@@ -47,11 +47,35 @@ as your +reset_query+...
 
 === local_preload_libraries
 
+==== If you have +8.3+
+
 It's unfortunately not possible to call +SPI_connect()+ from the module
 initialization routine (+_PG_init()+) when called via
 +local_preload_libraries+, it's too much early. So fully transparent
 preparing of user given statement is not possible with the +pre_prepare+
 module, you still have to explicitely call +SELECT prepare_all()+.
+
+==== If running 8.4 or later
+
+To call +SPI_connect()+ in fact what's needed is an opened transaction and a
+current active Snapshot. Both are possible to acquire from within a
+dynamically loaded module, so +preprepare+ is supporting the case.
+
+Update your +postgresql.conf+ to have the following:
+
+  custom_variable_classes = 'preprepare'
+  preprepare.at_init  = on
+  preprepare.relation = 'preprepare.statements'
+
+Then +reload+ PostgreSQL and enjoy: any new connection will have already
+prepared your statements by the time you're able to send queries, so you can
+forget about +PREPARE+ and directly +EXECUTE+. No need for extra software.
+
+Please note that if your statements contain any error, PostgreSQL will
+handle it as a +FATAL+ error and this will effectively prevent you from
+connecting to your server. You'll have to turn preprepare.at_init +off+
+again then +reload+, or remove +pre_prepare+ from +local_preload_libraries+
+then +restart+.
 
 == Usage
 

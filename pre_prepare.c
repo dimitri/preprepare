@@ -34,13 +34,20 @@
 #error "Unsupported postgresql version"
 #endif
 
-#if PG_MAJOR_VERSION >= 805
-#include "utils/snapmgr.h"
-#endif
-
 PG_MODULE_MAGIC;
 
+
+/*
+ * In 8.3 it seems that snapmgr.h is unavailable for module code
+ *
+ * That means there's no support for at_init and local_preload_libraries in
+ * this version.
+ */
+#if PG_MAJOR_VERSION > 803
+#include "utils/snapmgr.h"
 static bool pre_prepare_at_init   = false;
+#endif
+
 static char *pre_prepare_relation = NULL;
 
 void _PG_init(void);
@@ -131,6 +138,10 @@ int pre_prepare_all() {
  */
 void
 _PG_init(void) {
+  /*
+   * From 8.4 the Custom variables take two new options, the default value
+   * and a flags field
+   */
 #if PG_MAJOR_VERSION == 803
   DefineCustomStringVariable("preprepare.relation",
 			     "Table name where to find statements to prepare",
@@ -139,6 +150,21 @@ _PG_init(void) {
 			     PGC_USERSET,
 			     NULL, 
 			     NULL);
+
+  /*
+   * It's missing a way to use PushActiveSnapshot/PopActiveSnapshot from
+   * within a module in 8.3 for this to be useful.
+   *
+  DefineCustomBoolVariable("preprepare.at_init",
+			   "Do we prepare the statements at backend start",
+			   "You have to setup local_preload_libraries too",
+			   &pre_prepare_at_init,
+			   PGC_USERSET,
+			   NULL,
+			   NULL);
+  */
+  EmitWarningsOnPlaceholders("prepare.relation");
+
 #else
   DefineCustomStringVariable("preprepare.relation",
 			     "Table name where to find statements to prepare",
@@ -149,15 +175,7 @@ _PG_init(void) {
 			     GUC_NOT_IN_SAMPLE,
 			     NULL, 
 			     NULL);
-#endif
-  EmitWarningsOnPlaceholders("prepare.relation");
 
-#if PG_MAJOR_VERSION == 805
-  /*
-   * The at_init hook requires PostgreSQL to load its
-   * local_preload_libraries from within a transaction, which ain't the case
-   * before 8.5
-   */
   DefineCustomBoolVariable("preprepare.at_init",
 			   "Do we prepare the statements at backend start",
 			   "You have to setup local_preload_libraries too",
@@ -168,15 +186,21 @@ _PG_init(void) {
 			   NULL,
 			   NULL);
 
+  EmitWarningsOnPlaceholders("prepare.relation");
+  EmitWarningsOnPlaceholders("prepare.at_init");
+
   if( pre_prepare_at_init ) {
     int err;
 
     /*
-     * Connecting to SPI requires having opened a transaction and
-     * initialized its memory context.
+     * We want to use SPI, so we need to ensure there's a current started
+     * transaction, then take a snapshot
+    start_xact_command();
      */
     Snapshot snapshot;
-    CommandCounterIncrement();
+
+    StartTransactionCommand();
+    /* CommandCounterIncrement(); */
     snapshot = GetTransactionSnapshot();
     PushActiveSnapshot(snapshot);
 
@@ -198,6 +222,7 @@ _PG_init(void) {
       elog(ERROR, "SPI_finish: %s", SPI_result_code_string(err));
 
     PopActiveSnapshot();
+    CommitTransactionCommand();
   }
 #endif
 }
