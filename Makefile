@@ -30,6 +30,6 @@ prepare:
 	mkdir -p $(BUILDDIR)/$(SOURCE)
 	rsync -Ca --exclude $(DEBIAN) $(SRC)/* $(BUILDDIR)/$(SOURCE)
 	rsync -Ca $(BUILDDIR)/$(SOURCE)/ $(BUILDDIR)/$(ORIG)/
-	cp -a $(DEBIAN) $(BUILDDIR)/$(SOURCE)
+	rsync -Ca $(DEBIAN) $(BUILDDIR)/$(SOURCE)
 
 
