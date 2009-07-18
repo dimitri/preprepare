@@ -1,3 +1,11 @@
+preprepare (0.3-1) unstable; urgency=low
+
+  * Add support for discard() function
+  * Add support for prepare_all('schema.relation'), overriding GUC setting
+  * Document those additions
+
+ -- Dimitri Fontaine <dim@tapoueh.org>  Sat, 18 Jul 2009 23:11:53 +0200
+
 preprepare (0.2-1) unstable; urgency=low
 
   * Add support for local_preload_libraries and preprepare.at_init = on
@@ -7,7 +15,7 @@ preprepare (0.2-1) unstable; urgency=low
  -- Dimitri Fontaine <dim@tapoueh.org>  Tue, 07 Jul 2009 09:58:08 +0200
 
 preprepare (0.1-1) unstable; urgency=low
-  
+
   * Initial release
 
  -- Dimitri Fontaine <dim@tapoueh.org>  Wed, 13 May 2009 16:42:29 +0200

@@ -59,17 +59,17 @@ Datum prepare_all(PG_FUNCTION_ARGS);
  * The catalog inquiry could use some optimisation (index use prevented).
  */
 static inline
-bool check_pre_prepare_relation() {
+bool check_pre_prepare_relation(const char *relation_name) {
   int err;
 
   char *stmpl  = "SELECT 1 FROM pg_class WHERE " \
     "(SELECT nspname from pg_namespace WHERE oid = relnamespace) " \
     "|| '.' || relname = '%s';";
 
-  int len      = (strlen(stmpl) - 2) + strlen(pre_prepare_relation) + 1;
+  int len      = (strlen(stmpl) - 2) + strlen(relation_name) + 1;
   char *select = (char *)palloc(len * sizeof(char));
 
-  snprintf(select, len, stmpl, pre_prepare_relation);
+  snprintf(select, len, stmpl, relation_name);
 
 #ifdef DEBUG
   elog(NOTICE, select);
@@ -87,13 +87,13 @@ bool check_pre_prepare_relation() {
  * Prepare all the statements in pre_prepare.relation
  */
 static inline
-int pre_prepare_all() {
+int pre_prepare_all(const char *relation_name) {
   int err, nbrows = 0;
   char *stmpl  = "SELECT name, statement FROM %s";
-  int len      = (strlen(stmpl) - 2) + strlen(pre_prepare_relation) + 1;
+  int len      = (strlen(stmpl) - 2) + strlen(relation_name) + 1;
   char *select = (char *)palloc(len);
 
-  snprintf(select, len, stmpl, pre_prepare_relation);
+  snprintf(select, len, stmpl, relation_name);
   err = SPI_execute(select, true, 0);
 
   if( err != SPI_OK_SELECT ) {
@@ -208,14 +208,14 @@ _PG_init(void) {
     if (err != SPI_OK_CONNECT)
       elog(ERROR, "SPI_connect: %s", SPI_result_code_string(err));
     
-    if( ! check_pre_prepare_relation() ) {
+    if( ! check_pre_prepare_relation(pre_prepare_relation) ) {
       ereport(ERROR,
 	      (errcode(ERRCODE_DATA_EXCEPTION),
 	       errmsg("Can not find relation '%s'", pre_prepare_relation),
 	       errhint("Set preprepare.relation to an existing table.")));
     }
     
-    pre_prepare_all(false);
+    pre_prepare_all(pre_prepare_relation);
     
     err = SPI_finish();
     if (err != SPI_OK_FINISH)
@@ -234,30 +234,52 @@ PG_FUNCTION_INFO_V1(prepare_all);
 Datum
 prepare_all(PG_FUNCTION_ARGS)
 {
+  char * relation = NULL;
   int err;
 
-  if( pre_prepare_relation == NULL )
-    ereport(ERROR,
-	    (errcode(ERRCODE_DATA_EXCEPTION),
-	     errmsg("The custom variable preprepare.relation is not set."),
-	     errhint("Set preprepare.relation to an existing table.")));
+  /*
+   * we support for the user to override the GUC by passing in the relation name
+   * SELECT prepare_all('some_other_statements');
+   */
+  if( PG_NARGS() == 1 )
+    relation = DatumGetCString(DirectFunctionCall1(textout, 
+						   PointerGetDatum(PG_GETARG_TEXT_P(0))));
+  else
+    {
+      relation = pre_prepare_relation;
+
+      /*
+       * The function is STRICT so we don't check this error case in the
+       * previous branch
+       */
+      if( relation == NULL )
+	ereport(ERROR,
+		(errcode(ERRCODE_DATA_EXCEPTION),
+		 errmsg("The custom variable preprepare.relation is not set."),
+		 errhint("Set preprepare.relation to an existing table.")));
+    }
 
   err = SPI_connect();
   if (err != SPI_OK_CONNECT)
     elog(ERROR, "SPI_connect: %s", SPI_result_code_string(err));
 
-  if( ! check_pre_prepare_relation() ) {
-    ereport(ERROR,
-	    (errcode(ERRCODE_DATA_EXCEPTION),
-	     errmsg("Can not find relation '%s'", pre_prepare_relation),
-	     errhint("Set preprepare.relation to an existing table.")));
-  }
+  if( ! check_pre_prepare_relation(relation) )
+    {
+      char *hint = "Set preprepare.relation to an existing table, schema qualified";
+      if( PG_NARGS() == 1 )
+	hint = "prepare_all requires you to schema qualify the relation name";
+	
+      ereport(ERROR,
+	      (errcode(ERRCODE_DATA_EXCEPTION),
+	       errmsg("Can not find relation '%s'", relation),
+	       errhint(hint)));
+    }
 
 #ifdef DEBUG
   elog(NOTICE, "preprepare.relation is found, proceeding");
 #endif
 
-  pre_prepare_all(false);
+  pre_prepare_all(relation);
 
   /* done with SPI */
   err = SPI_finish();

@@ -83,5 +83,30 @@ First create a table where to store your statements, e.g.:
 
   create table pre_prepare.statements(name text primary key, statement text);
 
-Then connect to PostgreSQL via +pgbouncer+ and run the +EXECUTE+ command
-matching with your +PREPARE+ statements, they all are already prepared.
+=== prepare_all()
+
+Then connect to PostgreSQL (via +pgbouncer+ if not using
++local_preload_libraries+) and run the +EXECUTE+ command matching with your
++PREPARE+ statements, they all are already prepared.
+
+If not using +pgbouncer+ nor +preprepare.at_init = on+, you'll have to call
+the function yourself to have your statements prepared:
+
+  SELECT prepare_all();
+
+=== prepare_all('schema.table')
+
+If you're not in a position to always prepare the same set of queries, you
+can use the second form of +prepare_all+ calling, which accepts a specific
+statements table:
+
+  SELECT prepare_all('public.expensive_planning');
+
+This can be automated in a special +pgbouncer+ fake +database+ where the
++connect_query+ will prepare specific queries when you know you need them in
+some occasion, but they're way to expensive to always prepare ahead of time.
+
+=== discard()
+
+The module also offers a +discard()+ function which does the same as
++DISCARD ALL+ except that it won't call +DEALLOCATE ALL+.
