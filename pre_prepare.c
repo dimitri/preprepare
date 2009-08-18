@@ -138,57 +138,76 @@ int pre_prepare_all(const char *relation_name) {
  */
 void
 _PG_init(void) {
-  /*
-   * From 8.4 the Custom variables take two new options, the default value
-   * and a flags field
-   */
-#if PG_MAJOR_VERSION == 803
-  DefineCustomStringVariable("preprepare.relation",
-			     "Table name where to find statements to prepare",
-			     "Can be schema qualified, must have columns \"name\" and \"statement\"",
-			     &pre_prepare_relation,
-			     PGC_USERSET,
-			     NULL, 
-			     NULL);
+  PG_TRY();
+  {
+#if PG_MAJOR_VERSION == 804
+    bool at_init = false;
+    
+    if( parse_bool(GetConfigOptionByName("prepare.at_init", NULL), &at_init) )
+      pre_prepare_at_init = at_init;
+#endif
 
-  /*
-   * It's missing a way to use PushActiveSnapshot/PopActiveSnapshot from
-   * within a module in 8.3 for this to be useful.
-   *
-  DefineCustomBoolVariable("preprepare.at_init",
-			   "Do we prepare the statements at backend start",
-			   "You have to setup local_preload_libraries too",
-			   &pre_prepare_at_init,
-			   PGC_USERSET,
-			   NULL,
-			   NULL);
-  */
-  EmitWarningsOnPlaceholders("prepare.relation");
+    pre_prepare_relation = GetConfigOptionByName("prepare.relation", NULL);
+  }
+  PG_CATCH();
+  {
+    /*
+     * From 8.4 the Custom variables take two new options, the default value
+     * and a flags field
+     */
+#if PG_MAJOR_VERSION == 803
+    DefineCustomStringVariable("preprepare.relation",
+			       "Table name where to find statements to prepare",
+			       "Can be schema qualified, must have columns "
+			       "\"name\" and \"statement\"",
+			       &pre_prepare_relation,
+			       PGC_USERSET,
+			       NULL, 
+			       NULL);
+
+    /*
+     * It's missing a way to use PushActiveSnapshot/PopActiveSnapshot from
+     * within a module in 8.3 for this to be useful.
+     *
+     DefineCustomBoolVariable("preprepare.at_init",
+			      "Do we prepare the statements at backend start",
+			      "You have to setup local_preload_libraries too",
+			      &pre_prepare_at_init,
+			      PGC_USERSET,
+			      NULL,
+			      NULL);
+    */
+    EmitWarningsOnPlaceholders("prepare.relation");
 
 #else
-  DefineCustomStringVariable("preprepare.relation",
-			     "Table name where to find statements to prepare",
-			     "Can be schema qualified, must have columns \"name\" and \"statement\"",
-			     &pre_prepare_relation,
-			     "",
+    DefineCustomStringVariable("preprepare.relation",
+			       "Table name where to find statements to prepare",
+			       "Can be schema qualified, must have columns "
+			       "\"name\" and \"statement\"",
+			       &pre_prepare_relation,
+			       "",
+			       PGC_USERSET,
+			       GUC_NOT_IN_SAMPLE,
+			       NULL, 
+			       NULL);
+
+    DefineCustomBoolVariable("preprepare.at_init",
+			     "Do we prepare the statements at backend start",
+			     "You have to setup local_preload_libraries too",
+			     &pre_prepare_at_init,
+			     false,
 			     PGC_USERSET,
 			     GUC_NOT_IN_SAMPLE,
-			     NULL, 
+			     NULL,
 			     NULL);
 
-  DefineCustomBoolVariable("preprepare.at_init",
-			   "Do we prepare the statements at backend start",
-			   "You have to setup local_preload_libraries too",
-			   &pre_prepare_at_init,
-			   false,
-			   PGC_USERSET,
-			   GUC_NOT_IN_SAMPLE,
-			   NULL,
-			   NULL);
+    EmitWarningsOnPlaceholders("prepare.relation");
+    EmitWarningsOnPlaceholders("prepare.at_init");
+#endif
+  }
+  PG_END_TRY();
 
-  EmitWarningsOnPlaceholders("prepare.relation");
-  EmitWarningsOnPlaceholders("prepare.at_init");
-
+#if PG_MAJOR_VERSION == 804
   if( pre_prepare_at_init ) {
     int err;
 
