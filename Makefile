@@ -12,8 +12,8 @@ DEBIAN   = debian
 PACKAGE  = postgresql-8.[34]-preprepare
 SOURCE   = preprepare
 
-README.html: README
-	asciidoc -a toc README
+README.html: README.asciidoc
+	asciidoc -a toc README.asciidoc
 
 unsign-deb: prepare
 	cd $(BUILDDIR)/$(SOURCE) && debuild -us -uc
