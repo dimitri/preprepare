@@ -22,14 +22,20 @@ PKGVERS = $(shell dpkg-parsechangelog | awk -F '[:-]' '/^Version:/ { print subst
 EXCLUDE = --exclude-vcs --exclude=debian
 
 include /usr/share/postgresql-common/pgxs_debian_control.mk
+.PHONY: debian/control
 
-override_dh_auto_clean: debian/control
-	pg_buildext clean $(SRCDIR) $(TARGET) "$(CFLAGS)"
+clean: debian/control
+
+override_dh_auto_clean:
+	+pg_buildext clean $(SRCDIR) $(TARGET) "$(CFLAGS)"
 	dh_clean
 
 override_dh_auto_build:
 	# build all supported version
 	+pg_buildext build $(SRCDIR) $(TARGET) "$(CFLAGS)"
+
+override_dh_auto_install:
+	:
 
 orig: debian/control clean
 	cd .. && tar czf pre_prepare_$(PKGVERS).orig.tar.gz $(EXCLUDE) preprepare
