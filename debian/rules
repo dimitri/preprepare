@@ -38,7 +38,7 @@ override_dh_auto_install:
 	done
 
 orig: debian/control clean
-	cd .. && tar czf pgfincore_$(PKGVERS).orig.tar.gz $(EXCLUDE) preprepare
+	cd .. && tar czf pre_prepare_$(PKGVERS).orig.tar.gz $(EXCLUDE) preprepare
 
 %:
 	dh $@
