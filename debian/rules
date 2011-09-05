@@ -31,12 +31,6 @@ override_dh_auto_build:
 	# build all supported version
 	+pg_buildext build $(SRCDIR) $(TARGET) "$(CFLAGS)"
 
-override_dh_auto_install: 
-	# then install each of them
-	for v in `pg_buildext supported-versions $(SRCDIR)`; do \
-		dh_install -ppostgresql-$$v-preprepare ;\
-	done
-
 orig: debian/control clean
 	cd .. && tar czf pre_prepare_$(PKGVERS).orig.tar.gz $(EXCLUDE) preprepare
 
