@@ -1,62 +1,45 @@
 #!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+#
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+#
+# Modified to make a template file for a multi-binary package with separated
+# build-arch and build-indep targets  by Bill Allombert 2001
 
-PG_CFG83 = /usr/lib/postgresql/8.3/bin/pg_config
-PG_CFG84 = /usr/lib/postgresql/8.4/bin/pg_config
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
 
-CFLAGS83 = $(shell $(PG_CFG83) --cflags)
-CFLAGS84 = $(shell $(PG_CFG84) --cflags)
-
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-	CFLAGS83 += -O0
-	CFLAGS84 += -O0
-else
-	CFLAGS83 += -O2
-	CFLAGS84 += -O2
-endif
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
 
 SRCDIR = $(CURDIR)
-TGT83  = $(CURDIR)/debian/preprepare-8.3
-TGT84  = $(CURDIR)/debian/preprepare-8.4
+TARGET = $(CURDIR)/debian/preprepare-%v
+PKGVERS = $(shell dpkg-parsechangelog | awk -F '[:-]' '/^Version:/ { print substr($$2, 2) }')
+EXCLUDE = --exclude-vcs --exclude=debian
 
-build:
+include /usr/share/postgresql-common/pgxs_debian_control.mk
 
-clean:
-	dh_testdir
-	dh_testroot
-	$(MAKE) clean PG_CONFIG="$(PG_CFG83)"
-	$(MAKE) clean PG_CONFIG="$(PG_CFG84)"
-	rm -rf $(TGT83) $(TGT84)
-	dh_clean 
+override_dh_auto_clean: debian/control
+	pg_buildext clean $(SRCDIR) $(TARGET) "$(CFLAGS)"
+	dh_clean
 
-install: build
-	dh_testdir
-	dh_testroot
-	dh_clean -k 
-	dh_installdirs
+override_dh_auto_build:
+	# build all supported version
+	pg_buildext build $(SRCDIR) $(TARGET) "$(CFLAGS)"
 
-	mkdir -p $(TGT83) $(TGT84)
+override_dh_auto_install: 
+	# then install each of them
+	for v in `pg_buildext supported-versions $(SRCDIR)`; do \
+		dh_install -ppostgresql-$$v-preprepare ;\
+	done
 
-	cd $(TGT83) && $(MAKE) -f $(SRCDIR)/Makefile CFLAGS="$(CFLAGS)" PG_CONFIG="$(PG_CFG83)" VPATH="$(SRCDIR)"
-	dh_install -ppostgresql-8.3-preprepare
+orig: debian/control clean
+	cd .. && tar czf pgfincore_$(PKGVERS).orig.tar.gz $(EXCLUDE) preprepare
 
-	cd $(TGT84) && $(MAKE) -f $(SRCDIR)/Makefile CFLAGS="$(CFLAGS)" PG_CONFIG="$(PG_CFG84)" VPATH="$(SRCDIR)"
-	dh_install -ppostgresql-8.4-preprepare
+%:
+	dh $@
 
-binary-indep: build install
-binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs
-	dh_installdocs
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-binary: binary-indep binary-arch
-.PHONY: build clean binary-indep binary-arch binary install

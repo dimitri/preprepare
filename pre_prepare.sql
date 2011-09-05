@@ -1,16 +1,14 @@
 ---
 --- pre_prepare exports only a prepare_all() function.
 ---
-BEGIN;
-
 CREATE OR REPLACE FUNCTION prepare_all()
 RETURNS void
-AS 'MODULE_PATHNAME', 'prepare_all'
+AS '$libdir/pre_prepare', 'prepare_all'
 LANGUAGE 'C' STRICT VOLATILE;
 
 CREATE OR REPLACE FUNCTION prepare_all(text)
 RETURNS void
-AS 'MODULE_PATHNAME', 'prepare_all'
+AS '$libdir/pre_prepare', 'prepare_all'
 LANGUAGE 'C' STRICT VOLATILE;
 
 CREATE OR REPLACE FUNCTION discard()
@@ -25,5 +23,3 @@ AS $$
   DISCARD PLANS;
   DISCARD TEMP;
 $$;
-
-COMMIT;

@@ -1,0 +1,5 @@
+# preprepare extension
+comment = 'Pre Prepare your Statement server side'
+default_version = '0.4'
+module_pathname = '$libdir/pre_prepare'
+relocatable = true

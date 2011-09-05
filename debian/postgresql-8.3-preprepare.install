@@ -1,2 +1,2 @@
 debian/preprepare-8.3/pre_prepare.so usr/lib/postgresql/8.3/lib
-debian/preprepare-8.3/pre_prepare.sql usr/share/postgresql/8.3/contrib
+pre_prepare.sql usr/share/postgresql/8.3/contrib

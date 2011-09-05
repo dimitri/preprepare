@@ -9,7 +9,7 @@ SRC      = .
 BUILDDIR = /tmp/preprepare
 ORIG     = preprepare.orig
 DEBIAN   = debian
-PACKAGE  = postgresql-8.[34]-preprepare
+PACKAGE  = postgresql-?.?-preprepare
 SOURCE   = preprepare
 
 README.html: README.asciidoc

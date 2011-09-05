@@ -30,7 +30,8 @@
 #error "Unknown postgresql version"
 #endif
 
-#if PG_MAJOR_VERSION != 803 && PG_MAJOR_VERSION != 804 && PG_MAJOR_VERSION != 805
+#if PG_MAJOR_VERSION != 803 && PG_MAJOR_VERSION != 804 \
+ && PG_MAJOR_VERSION != 900 && PG_MAJOR_VERSION != 901
 #error "Unsupported postgresql version"
 #endif
 
@@ -107,14 +108,14 @@ int pre_prepare_all(const char *relation_name) {
     TupleDesc tupdesc = SPI_tuptable->tupdesc;
     SPITupleTable *tuptable = SPI_tuptable;
     int row;
-        
+
     for (row = 0; row < nbrows; row++) {
       HeapTuple tuple = tuptable->vals[row];
       char *name = SPI_getvalue(tuple, tupdesc, 1);
       char *stmt = SPI_getvalue(tuple, tupdesc, 2);
 
       elog(NOTICE, "Preparing statement name: %s", name);
-      
+
       err = SPI_execute(stmt, false, 0);
 
       if( err != SPI_OK_UTILITY ) {
@@ -142,7 +143,7 @@ _PG_init(void) {
   {
 #if PG_MAJOR_VERSION == 804
     bool at_init = false;
-    
+
     if( parse_bool(GetConfigOptionByName("prepare.at_init", NULL), &at_init) )
       pre_prepare_at_init = at_init;
 #endif
@@ -162,7 +163,7 @@ _PG_init(void) {
 			       "\"name\" and \"statement\"",
 			       &pre_prepare_relation,
 			       PGC_USERSET,
-			       NULL, 
+			       NULL,
 			       NULL);
 
     /*
@@ -179,7 +180,7 @@ _PG_init(void) {
     */
     EmitWarningsOnPlaceholders("prepare.relation");
 
-#else
+#elif PG_MAJOR_VERSION == 804 || PG_MAJOR_VERSION == 900
     DefineCustomStringVariable("preprepare.relation",
 			       "Table name where to find statements to prepare",
 			       "Can be schema qualified, must have columns "
@@ -188,7 +189,7 @@ _PG_init(void) {
 			       "",
 			       PGC_USERSET,
 			       GUC_NOT_IN_SAMPLE,
-			       NULL, 
+			       NULL,
 			       NULL);
 
     DefineCustomBoolVariable("preprepare.at_init",
@@ -203,11 +204,37 @@ _PG_init(void) {
 
     EmitWarningsOnPlaceholders("prepare.relation");
     EmitWarningsOnPlaceholders("prepare.at_init");
+#else
+    DefineCustomStringVariable("preprepare.relation",
+			       "Table name where to find statements to prepare",
+			       "Can be schema qualified, must have columns "
+			       "\"name\" and \"statement\"",
+			       &pre_prepare_relation,
+			       "",
+			       PGC_USERSET,
+			       GUC_NOT_IN_SAMPLE,
+			       NULL,
+			       NULL,
+			       NULL);
+
+    DefineCustomBoolVariable("preprepare.at_init",
+			     "Do we prepare the statements at backend start",
+			     "You have to setup local_preload_libraries too",
+			     &pre_prepare_at_init,
+			     false,
+			     PGC_USERSET,
+			     GUC_NOT_IN_SAMPLE,
+			     NULL,
+			     NULL,
+			     NULL);
+
+    EmitWarningsOnPlaceholders("prepare.relation");
+    EmitWarningsOnPlaceholders("prepare.at_init");
 #endif
   }
   PG_END_TRY();
 
-#if PG_MAJOR_VERSION == 804
+#if PG_MAJOR_VERSION >= 804
   if( pre_prepare_at_init ) {
     int err;
 
@@ -226,16 +253,16 @@ _PG_init(void) {
     err = SPI_connect();
     if (err != SPI_OK_CONNECT)
       elog(ERROR, "SPI_connect: %s", SPI_result_code_string(err));
-    
+
     if( ! check_pre_prepare_relation(pre_prepare_relation) ) {
       ereport(ERROR,
 	      (errcode(ERRCODE_DATA_EXCEPTION),
 	       errmsg("Can not find relation '%s'", pre_prepare_relation),
 	       errhint("Set preprepare.relation to an existing table.")));
     }
-    
+
     pre_prepare_all(pre_prepare_relation);
-    
+
     err = SPI_finish();
     if (err != SPI_OK_FINISH)
       elog(ERROR, "SPI_finish: %s", SPI_result_code_string(err));
@@ -261,7 +288,7 @@ prepare_all(PG_FUNCTION_ARGS)
    * SELECT prepare_all('some_other_statements');
    */
   if( PG_NARGS() == 1 )
-    relation = DatumGetCString(DirectFunctionCall1(textout, 
+    relation = DatumGetCString(DirectFunctionCall1(textout,
 						   PointerGetDatum(PG_GETARG_TEXT_P(0))));
   else
     {
@@ -287,7 +314,7 @@ prepare_all(PG_FUNCTION_ARGS)
       char *hint = "Set preprepare.relation to an existing table, schema qualified";
       if( PG_NARGS() == 1 )
 	hint = "prepare_all requires you to schema qualify the relation name";
-	
+
       ereport(ERROR,
 	      (errcode(ERRCODE_DATA_EXCEPTION),
 	       errmsg("Can not find relation '%s'", relation),

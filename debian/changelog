@@ -1,3 +1,9 @@
+preprepare (0.4-2) unstable; urgency=low
+
+  * Repackage for 9.1 support (Closes: #639482)
+
+ -- Dimitri Fontaine <dim@tapoueh.org>  Mon, 05 Sep 2011 13:04:51 +0200
+
 preprepare (0.4-1) unstable; urgency=low
 
   * Better support for GUC options
