@@ -4,6 +4,14 @@ preprepare (0.4-2) unstable; urgency=low
 
  -- Dimitri Fontaine <dim@tapoueh.org>  Mon, 05 Sep 2011 13:04:51 +0200
 
+preprepare (0.4-1.1) unstable; urgency=low
+
+   * Non-maintainer upload.
+   * debian/{control, postgresql-8.3*, rules}
+      - support only PostgreSQL 8.4, dropping support for 8.3; thanks to Martin
+        Pitt for the report; Closes: #559611
+ -- Sandro Tosi <morph@debian.org>  Thu, 18 Feb 2010 15:08:52 +0100
+  
 preprepare (0.4-1) unstable; urgency=low
 
   * Better support for GUC options
