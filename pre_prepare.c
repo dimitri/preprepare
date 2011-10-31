@@ -318,7 +318,7 @@ prepare_all(PG_FUNCTION_ARGS)
       ereport(ERROR,
 	      (errcode(ERRCODE_DATA_EXCEPTION),
 	       errmsg("Can not find relation '%s'", relation),
-	       errhint(hint)));
+	       errhint("%s", hint)));
     }
 
 #ifdef DEBUG
