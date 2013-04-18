@@ -1,3 +1,10 @@
+preprepare (0.5-2) UNRELEASED; urgency=low
+
+  * Convert debian/*.docs to dh_installdocs --all.
+  * Add myself to Uploaders.
+
+ -- Christoph Berg <myon@debian.org>  Wed, 17 Apr 2013 19:56:35 +0200
+
 preprepare (0.5-1) unstable; urgency=low
 
   * Fix an error with -Werror=format-security, from ubuntu builds (Closes: #647222)
