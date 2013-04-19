@@ -9,7 +9,7 @@ Standards-Version: 3.9.3
 Package: postgresql-PGVERSION-preprepare
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}, postgresql-PGVERSION
-Description: pre prepare your statement server side
- The +pre_prepare+ module aims to prepare all your statements as soon as
- possible and in a way that allows client queries not to bother at all and
- just call EXECUTE.
+Description: pre prepare your PostgreSQL statements server side
+ The pre_prepare module for PostgreSQL aims to prepare all your statements as
+ soon as possible and in a way that allows client queries not to bother at all
+ and just call EXECUTE.

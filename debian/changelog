@@ -2,6 +2,7 @@ preprepare (0.5-2) UNRELEASED; urgency=low
 
   * Convert debian/*.docs to dh_installdocs --all.
   * Add myself to Uploaders.
+  * Update description to mention PostgreSQL.
 
  -- Christoph Berg <myon@debian.org>  Wed, 17 Apr 2013 19:56:35 +0200
 
