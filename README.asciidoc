@@ -83,6 +83,11 @@ First create a table where to store your statements, e.g.:
 
   create table pre_prepare.statements(name text primary key, statement text);
 
+The statement stored is the complete statement including the +PREPARE name AS+
+part.
+
+  insert into pre_prepare.statements values ('test', 'prepare test as select 1');
+
 === prepare_all()
 
 Then connect to PostgreSQL (via +pgbouncer+ if not using
