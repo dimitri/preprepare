@@ -1,4 +1,4 @@
 debian/preprepare-9.1/pre_prepare.so usr/lib/postgresql/9.1/lib
-pre_prepare.sql usr/share/postgresql/9.1/extension
+pre_prepare--0.4.sql usr/share/postgresql/9.1/extension
 pre_prepare--unpackaged--0.4.sql usr/share/postgresql/9.1/extension
 pre_prepare.control usr/share/postgresql/9.1/extension

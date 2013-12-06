@@ -4,12 +4,12 @@
 CREATE OR REPLACE FUNCTION prepare_all()
 RETURNS void
 AS '$libdir/pre_prepare', 'prepare_all'
-LANGUAGE 'C' STRICT VOLATILE;
+LANGUAGE C STRICT VOLATILE;
 
 CREATE OR REPLACE FUNCTION prepare_all(text)
 RETURNS void
 AS '$libdir/pre_prepare', 'prepare_all'
-LANGUAGE 'C' STRICT VOLATILE;
+LANGUAGE C STRICT VOLATILE;
 
 CREATE OR REPLACE FUNCTION discard()
 RETURNS void

@@ -31,7 +31,9 @@
 #endif
 
 #if PG_MAJOR_VERSION != 803 && PG_MAJOR_VERSION != 804 \
- && PG_MAJOR_VERSION != 900 && PG_MAJOR_VERSION != 901
+ && PG_MAJOR_VERSION != 900 && PG_MAJOR_VERSION != 901 \
+ && PG_MAJOR_VERSION != 902 && PG_MAJOR_VERSION != 903 \
+ && PG_MAJOR_VERSION != 904
 #error "Unsupported postgresql version"
 #endif
 
