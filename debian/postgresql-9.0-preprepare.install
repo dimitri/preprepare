@@ -1,2 +1,0 @@
-debian/preprepare-9.0/pre_prepare.so usr/lib/postgresql/9.0/lib
-pre_prepare.sql usr/share/postgresql/9.0/contrib

@@ -7,7 +7,6 @@ EXCLUDE = --exclude-vcs --exclude=debian
 
 include /usr/share/postgresql-common/pgxs_debian_control.mk
 .PHONY: debian/control
-
 clean: debian/control
 
 override_dh_auto_clean:
@@ -15,11 +14,9 @@ override_dh_auto_clean:
 	dh_clean
 
 override_dh_auto_build:
-	# build all supported version
-	+pg_buildext build $(SRCDIR) $(TARGET) "$(CFLAGS)"
 
 override_dh_auto_install:
-	:
+	+pg_buildext loop postgresql-%v-preprepare
 
 override_dh_installdocs:
 	dh_installdocs --all README.asciidoc

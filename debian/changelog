@@ -1,6 +1,7 @@
 preprepare (0.5-2) UNRELEASED; urgency=low
 
   * Convert debian/*.docs to dh_installdocs --all.
+  * debian/rules: Use "pg_buildext loop".
   * Add myself to Uploaders.
   * Update description to mention PostgreSQL.
   * Add example query to README.*.
