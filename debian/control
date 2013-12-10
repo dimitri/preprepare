@@ -4,11 +4,12 @@ Priority: extra
 Maintainer: Dimitri Fontaine <dim@tapoueh.org>
 Uploaders: Christoph Berg <myon@debian.org>
 Build-Depends: debhelper (>= 7.0.50~), postgresql-server-dev-all
-Standards-Version: 3.9.3
+Standards-Version: 3.9.5
+XS-Testsuite: autopkgtest
 
-Package: postgresql-9.1-preprepare
+Package: postgresql-9.3-preprepare
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, postgresql-9.1
+Depends: ${misc:Depends}, ${shlibs:Depends}, postgresql-9.3
 Description: pre prepare your PostgreSQL statements server side
  The pre_prepare module for PostgreSQL aims to prepare all your statements as
  soon as possible and in a way that allows client queries not to bother at all

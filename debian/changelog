@@ -6,8 +6,9 @@ preprepare (0.6-2) UNRELEASED; urgency=low
   * Update description to mention PostgreSQL.
   * Add example query to README.*.
   * Run regression tests using autopkgtest.
+  * Add watch file.
 
- -- Christoph Berg <myon@debian.org>  Wed, 17 Apr 2013 19:56:35 +0200
+ -- Christoph Berg <christoph.berg@credativ.de>  Tue, 10 Dec 2013 17:23:16 +0100
 
 preprepare (0.5-1) unstable; urgency=low
 

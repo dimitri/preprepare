@@ -22,7 +22,7 @@ override_dh_installdocs:
 	dh_installdocs --all README.asciidoc
 
 orig: debian/control clean
-	cd .. && tar czf pre_prepare_$(PKGVERS).orig.tar.gz $(EXCLUDE) preprepare
+	cd .. && tar czf preprepare_$(PKGVERS).orig.tar.gz $(EXCLUDE) preprepare
 
 %:
 	dh $@
