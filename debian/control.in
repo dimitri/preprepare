@@ -5,6 +5,7 @@ Maintainer: Dimitri Fontaine <dim@tapoueh.org>
 Uploaders: Christoph Berg <myon@debian.org>
 Build-Depends: debhelper (>= 7.0.50~), postgresql-server-dev-all
 Standards-Version: 3.9.5
+XS-Testsuite: autopkgtest
 
 Package: postgresql-PGVERSION-preprepare
 Architecture: any

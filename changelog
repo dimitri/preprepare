@@ -1,3 +1,9 @@
+preprepare (0.6) upstream; urgency=medium
+
+  * Add regression test.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Tue, 10 Dec 2013 17:18:47 +0100
+
 preprepare (0.1-1) unstable; urgency=low
   
   * Initial release
