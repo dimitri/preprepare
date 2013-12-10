@@ -1,5 +1,6 @@
-preprepare (0.6-2) UNRELEASED; urgency=low
+preprepare (0.6-1) unstable; urgency=low
 
+  * New upstream release with 9.3 support. (Closes: #731517)
   * Convert debian/*.docs to dh_installdocs --all.
   * debian/rules: Use "pg_buildext loop".
   * Add myself to Uploaders.
