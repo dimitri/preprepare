@@ -1,3 +1,9 @@
+preprepare (0.6-2) unstable; urgency=medium
+
+  * Add make to the test dependencies.
+
+ -- Christoph Berg <myon@debian.org>  Sun, 26 Jan 2014 17:43:54 +0100
+
 preprepare (0.6-1) unstable; urgency=low
 
   * New upstream release with 9.3 support. (Closes: #731517)
