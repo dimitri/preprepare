@@ -1,3 +1,10 @@
+preprepare (0.6-3) UNRELEASED; urgency=medium
+
+  * Use "all" in debian/pgversions.
+  * Set team as maintainer.
+
+ -- Christoph Berg <myon@debian.org>  Sun, 15 Jun 2014 23:47:06 +0200
+
 preprepare (0.6-2) unstable; urgency=medium
 
   * Add make to the test dependencies.
