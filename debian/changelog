@@ -1,4 +1,4 @@
-preprepare (0.6-3) UNRELEASED; urgency=medium
+preprepare (0.7-1) unstable; urgency=medium
 
   * Ship plugin symlink in the package so users don't need to create them
     manually.
@@ -6,7 +6,7 @@ preprepare (0.6-3) UNRELEASED; urgency=medium
   * Add Vcs headers.
   * Set team as maintainer.
 
- -- Christoph Berg <myon@debian.org>  Sun, 15 Jun 2014 23:47:06 +0200
+ -- Christoph Berg <christoph.berg@credativ.de>  Tue, 24 Jun 2014 14:16:19 +0200
 
 preprepare (0.6-2) unstable; urgency=medium
 

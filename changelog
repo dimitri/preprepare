@@ -1,3 +1,10 @@
+preprepare (0.7) upstream; urgency=medium
+
+  * Relax PostgreSQL version check to allow all future versions. We'll find
+    problems using the regression tests.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Tue, 24 Jun 2014 14:29:30 +0200
+
 preprepare (0.6) upstream; urgency=medium
 
   * Add regression test.
