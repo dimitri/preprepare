@@ -5,6 +5,8 @@ Maintainer: Debian PostgreSQL Maintainers <pkg-postgresql-public@lists.alioth.de
 Uploaders: Dimitri Fontaine <dim@tapoueh.org>, Christoph Berg <myon@debian.org>
 Build-Depends: debhelper (>= 7.0.50~), postgresql-server-dev-all (>= 148~)
 Standards-Version: 3.9.5
+Vcs-Browser: https://github.com/dimitri/preprepare
+Vcs-Git: https://github.com/dimitri/preprepare.git
 XS-Testsuite: autopkgtest
 
 Package: postgresql-PGVERSION-preprepare

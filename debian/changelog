@@ -1,6 +1,7 @@
 preprepare (0.6-3) UNRELEASED; urgency=medium
 
   * Use "all" in debian/pgversions.
+  * Add Vcs headers.
   * Set team as maintainer.
 
  -- Christoph Berg <myon@debian.org>  Sun, 15 Jun 2014 23:47:06 +0200
