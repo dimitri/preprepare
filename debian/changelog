@@ -1,5 +1,7 @@
 preprepare (0.6-3) UNRELEASED; urgency=medium
 
+  * Ship plugin symlink in the package so users don't need to create them
+    manually.
   * Use "all" in debian/pgversions.
   * Add Vcs headers.
   * Set team as maintainer.

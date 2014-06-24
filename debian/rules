@@ -21,6 +21,9 @@ override_dh_auto_install:
 override_dh_installdocs:
 	dh_installdocs --all README.asciidoc
 
+override_dh_link:
+	set -ex; for v in $(shell pg_buildext supported-versions); do mkdir debian/postgresql-$$v-preprepare/usr/lib/postgresql/$$v/lib/plugins; ln -s ../pre_prepare.so debian/postgresql-$$v-preprepare/usr/lib/postgresql/$$v/lib/plugins; done
+
 orig: debian/control clean
 	cd .. && tar czf preprepare_$(PKGVERS).orig.tar.gz $(EXCLUDE) preprepare
 
