@@ -9,9 +9,9 @@ Vcs-Browser: https://github.com/dimitri/preprepare
 Vcs-Git: https://github.com/dimitri/preprepare.git
 XS-Testsuite: autopkgtest
 
-Package: postgresql-9.3-preprepare
+Package: postgresql-9.4-preprepare
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, postgresql-9.3
+Depends: ${misc:Depends}, ${shlibs:Depends}, postgresql-9.4
 Description: pre prepare your PostgreSQL statements server side
  The pre_prepare module for PostgreSQL aims to prepare all your statements as
  soon as possible and in a way that allows client queries not to bother at all
