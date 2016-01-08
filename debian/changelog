@@ -1,3 +1,10 @@
+preprepare (0.7-3) unstable; urgency=medium
+
+  * Reupload for 9.5.
+  * Fix Makefile to install sql files only once.
+
+ -- Christoph Berg <myon@debian.org>  Fri, 08 Jan 2016 21:33:47 +0100
+
 preprepare (0.7-2) unstable; urgency=medium
 
   * Reupload for 9.4.
