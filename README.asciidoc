@@ -23,7 +23,6 @@ may need to use sudo for the +make install+ step.
 
 Add a custom class then the following settings:
 
-  custom_variable_classes = 'preprepare'
   preprepare.relation = 'preprepare.statements'
 
 The +pre_prepare.relation+ is the name of the table where you'll put all the
@@ -33,6 +32,10 @@ the given relation must return the names and SQL statements to be prepared.
   SELECT name, statement FROM <pre_prepare.relation>;
 
 The statements won't be edited, so must be the all PREPARE stuff.
+
+When running PostgreSQL 9.1 or earlier, an additional setting is required:
+
+  custom_variable_classes = 'preprepare' # only for 9.1 and earlier
 
 === pgbouncer
 
@@ -63,7 +66,7 @@ dynamically loaded module, so +preprepare+ is supporting the case.
 
 Update your +postgresql.conf+ to have the following:
 
-  custom_variable_classes = 'preprepare'
+  custom_variable_classes = 'preprepare' # only for 9.1 and earlier
   preprepare.at_init  = on
   preprepare.relation = 'preprepare.statements'
 

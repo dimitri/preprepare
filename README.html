@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.7" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
 <title>pre_prepare</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -87,9 +87,15 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
+}
+pre {
+  white-space: pre-wrap;
 }
 
 #author {
@@ -219,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -415,12 +421,6 @@ div.unbreakable { page-break-inside: avoid; }
  *
  * */
 
-tt {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
-}
-
 div.tableblock {
   margin-top: 1.0em;
   margin-bottom: 1.5em;
@@ -453,12 +453,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -539,6 +533,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -747,9 +743,9 @@ asciidoc.install(2);
 <div class="sect1">
 <h2 id="_ideas">Ideas</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The <tt>pre_prepare</tt> module aims to prepare all your statements as soon as
+<div class="paragraph"><p>The <code>pre_prepare</code> module aims to prepare all your statements as soon as
 possible and in a way that allows client queries not to bother at all and
-just call <tt>EXECUTE</tt>.</p></div>
+just call <code>EXECUTE</code>.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -760,72 +756,76 @@ just call <tt>EXECUTE</tt>.</p></div>
 <div class="paragraph"><p>The module is using the PG_XS build infrastructure, so just:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>make
+<pre><code>make
 make install
-psql -f `pg_config --sharedir`/contrib/pre_prepare.sql -U user dbname</tt></pre>
+psql -f `pg_config --sharedir`/contrib/pre_prepare.sql -U user dbname</code></pre>
 </div></div>
 <div class="paragraph"><p>Depending on the way you got PostgreSQL installed in the first place, you
-may need to use sudo for the <tt>make install</tt> step.</p></div>
+may need to use sudo for the <code>make install</code> step.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_postgresql_conf">postgresql.conf</h3>
 <div class="paragraph"><p>Add a custom class then the following settings:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>custom_variable_classes = 'preprepare'
-preprepare.relation = 'preprepare.statements'</tt></pre>
+<pre><code>preprepare.relation = 'preprepare.statements'</code></pre>
 </div></div>
-<div class="paragraph"><p>The <tt>pre_prepare.relation</tt> is the name of the table where you&#8217;ll put all the
+<div class="paragraph"><p>The <code>pre_prepare.relation</code> is the name of the table where you&#8217;ll put all the
 statements you want to module to prepare. The following SQL query against
 the given relation must return the names and SQL statements to be prepared.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>SELECT name, statement FROM &lt;pre_prepare.relation&gt;;</tt></pre>
+<pre><code>SELECT name, statement FROM &lt;pre_prepare.relation&gt;;</code></pre>
 </div></div>
 <div class="paragraph"><p>The statements won&#8217;t be edited, so must be the all PREPARE stuff.</p></div>
+<div class="paragraph"><p>When running PostgreSQL 9.1 or earlier, an additional setting is required:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>custom_variable_classes = 'preprepare' # only for 9.1 and earlier</code></pre>
+</div></div>
 </div>
 <div class="sect2">
 <h3 id="_pgbouncer">pgbouncer</h3>
 <div class="paragraph"><p>When using pgbouncer, which is a good idea, consider setting up
-<tt>connect_query</tt> to prepare all the statements at server connection time.</p></div>
+<code>connect_query</code> to prepare all the statements at server connection time.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>[databases]
-foo = port=5432 connect_query='SELECT prepare_all();'</tt></pre>
+<pre><code>[databases]
+foo = port=5432 connect_query='SELECT prepare_all();'</code></pre>
 </div></div>
-<div class="paragraph"><p>Of course, if using <tt>pre_prepare</tt>, you&#8217;ll want to avoid using <tt>DISCARD ALL</tt>
-as your <tt>reset_query</tt>&#8230;</p></div>
+<div class="paragraph"><p>Of course, if using <code>pre_prepare</code>, you&#8217;ll want to avoid using <code>DISCARD ALL</code>
+as your <code>reset_query</code>&#8230;</p></div>
 </div>
 <div class="sect2">
 <h3 id="_local_preload_libraries">local_preload_libraries</h3>
 <div class="sect3">
-<h4 id="_if_you_have_tt_8_3_tt">If you have <tt>8.3</tt></h4>
-<div class="paragraph"><p>It&#8217;s unfortunately not possible to call <tt>SPI_connect()</tt> from the module
-initialization routine (<tt>_PG_init()</tt>) when called via
-<tt>local_preload_libraries</tt>, it&#8217;s too much early. So fully transparent
-preparing of user given statement is not possible with the <tt>pre_prepare</tt>
-module, you still have to explicitely call <tt>SELECT prepare_all()</tt>.</p></div>
+<h4 id="_if_you_have_code_8_3_code">If you have <code>8.3</code></h4>
+<div class="paragraph"><p>It&#8217;s unfortunately not possible to call <code>SPI_connect()</code> from the module
+initialization routine (<code>_PG_init()</code>) when called via
+<code>local_preload_libraries</code>, it&#8217;s too much early. So fully transparent
+preparing of user given statement is not possible with the <code>pre_prepare</code>
+module, you still have to explicitely call <code>SELECT prepare_all()</code>.</p></div>
 </div>
 <div class="sect3">
 <h4 id="_if_running_8_4_or_later">If running 8.4 or later</h4>
-<div class="paragraph"><p>To call <tt>SPI_connect()</tt> in fact what&#8217;s needed is an opened transaction and a
+<div class="paragraph"><p>To call <code>SPI_connect()</code> in fact what&#8217;s needed is an opened transaction and a
 current active Snapshot. Both are possible to acquire from within a
-dynamically loaded module, so <tt>preprepare</tt> is supporting the case.</p></div>
-<div class="paragraph"><p>Update your <tt>postgresql.conf</tt> to have the following:</p></div>
+dynamically loaded module, so <code>preprepare</code> is supporting the case.</p></div>
+<div class="paragraph"><p>Update your <code>postgresql.conf</code> to have the following:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>custom_variable_classes = 'preprepare'
+<pre><code>custom_variable_classes = 'preprepare' # only for 9.1 and earlier
 preprepare.at_init  = on
-preprepare.relation = 'preprepare.statements'</tt></pre>
+preprepare.relation = 'preprepare.statements'</code></pre>
 </div></div>
-<div class="paragraph"><p>Then <tt>reload</tt> PostgreSQL and enjoy: any new connection will have already
+<div class="paragraph"><p>Then <code>reload</code> PostgreSQL and enjoy: any new connection will have already
 prepared your statements by the time you&#8217;re able to send queries, so you can
-forget about <tt>PREPARE</tt> and directly <tt>EXECUTE</tt>. No need for extra software.</p></div>
+forget about <code>PREPARE</code> and directly <code>EXECUTE</code>. No need for extra software.</p></div>
 <div class="paragraph"><p>Please note that if your statements contain any error, PostgreSQL will
-handle it as a <tt>FATAL</tt> error and this will effectively prevent you from
-connecting to your server. You&#8217;ll have to turn preprepare.at_init <tt>off</tt>
-again then <tt>reload</tt>, or remove <tt>pre_prepare</tt> from <tt>local_preload_libraries</tt>
-then <tt>restart</tt>.</p></div>
+handle it as a <code>FATAL</code> error and this will effectively prevent you from
+connecting to your server. You&#8217;ll have to turn preprepare.at_init <code>off</code>
+again then <code>reload</code>, or remove <code>pre_prepare</code> from <code>local_preload_libraries</code>
+then <code>restart</code>.</p></div>
 </div>
 </div>
 </div>
@@ -836,43 +836,43 @@ then <tt>restart</tt>.</p></div>
 <div class="paragraph"><p>First create a table where to store your statements, e.g.:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>create table pre_prepare.statements(name text primary key, statement text);</tt></pre>
+<pre><code>create table pre_prepare.statements(name text primary key, statement text);</code></pre>
 </div></div>
-<div class="paragraph"><p>The statement stored is the complete statement including the <tt>PREPARE name AS</tt>
+<div class="paragraph"><p>The statement stored is the complete statement including the <code>PREPARE name AS</code>
 part.</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>insert into pre_prepare.statements values ('test', 'prepare test as select 1');</tt></pre>
+<pre><code>insert into pre_prepare.statements values ('test', 'prepare test as select 1');</code></pre>
 </div></div>
 <div class="sect2">
 <h3 id="_prepare_all">prepare_all()</h3>
-<div class="paragraph"><p>Then connect to PostgreSQL (via <tt>pgbouncer</tt> if not using
-<tt>local_preload_libraries</tt>) and run the <tt>EXECUTE</tt> command matching with your
-<tt>PREPARE</tt> statements, they all are already prepared.</p></div>
-<div class="paragraph"><p>If not using <tt>pgbouncer</tt> nor <tt>preprepare.at_init = on</tt>, you&#8217;ll have to call
+<div class="paragraph"><p>Then connect to PostgreSQL (via <code>pgbouncer</code> if not using
+<code>local_preload_libraries</code>) and run the <code>EXECUTE</code> command matching with your
+<code>PREPARE</code> statements, they all are already prepared.</p></div>
+<div class="paragraph"><p>If not using <code>pgbouncer</code> nor <code>preprepare.at_init = on</code>, you&#8217;ll have to call
 the function yourself to have your statements prepared:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>SELECT prepare_all();</tt></pre>
+<pre><code>SELECT prepare_all();</code></pre>
 </div></div>
 </div>
 <div class="sect2">
 <h3 id="_prepare_all_em_schema_table_em">prepare_all(<em>schema.table</em>)</h3>
 <div class="paragraph"><p>If you&#8217;re not in a position to always prepare the same set of queries, you
-can use the second form of <tt>prepare_all</tt> calling, which accepts a specific
+can use the second form of <code>prepare_all</code> calling, which accepts a specific
 statements table:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre><tt>SELECT prepare_all('public.expensive_planning');</tt></pre>
+<pre><code>SELECT prepare_all('public.expensive_planning');</code></pre>
 </div></div>
-<div class="paragraph"><p>This can be automated in a special <tt>pgbouncer</tt> fake <tt>database</tt> where the
-<tt>connect_query</tt> will prepare specific queries when you know you need them in
+<div class="paragraph"><p>This can be automated in a special <code>pgbouncer</code> fake <code>database</code> where the
+<code>connect_query</code> will prepare specific queries when you know you need them in
 some occasion, but they&#8217;re way to expensive to always prepare ahead of time.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_discard">discard()</h3>
-<div class="paragraph"><p>The module also offers a <tt>discard()</tt> function which does the same as
-<tt>DISCARD ALL</tt> except that it won&#8217;t call <tt>DEALLOCATE ALL</tt>.</p></div>
+<div class="paragraph"><p>The module also offers a <code>discard()</code> function which does the same as
+<code>DISCARD ALL</code> except that it won&#8217;t call <code>DEALLOCATE ALL</code>.</p></div>
 </div>
 </div>
 </div>
@@ -880,7 +880,8 @@ some occasion, but they&#8217;re way to expensive to always prepare ahead of tim
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-04-19 22:03:15 CEST
+Last updated
+ 2016-09-24 19:21:12 CEST
 </div>
 </div>
 </body>
