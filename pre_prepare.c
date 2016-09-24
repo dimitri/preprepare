@@ -147,7 +147,11 @@ _PG_init(void) {
       pre_prepare_at_init = at_init;
 #endif
 
-    pre_prepare_relation = GetConfigOptionByName("prepare.relation", NULL);
+    pre_prepare_relation = GetConfigOptionByName("prepare.relation", NULL
+#if PG_MAJOR_VERSION >= 906
+		    , false
+#endif
+		    );
   }
   PG_CATCH();
   {

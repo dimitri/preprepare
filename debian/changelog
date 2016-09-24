@@ -1,3 +1,9 @@
+preprepare (0.8-1) unstable; urgency=medium
+
+  * New upstream release with 9.6 support.
+
+ -- Christoph Berg <myon@debian.org>  Sat, 24 Sep 2016 18:56:26 +0200
+
 preprepare (0.7-3) unstable; urgency=medium
 
   * Reupload for 9.5.
