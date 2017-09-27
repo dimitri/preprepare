@@ -1,3 +1,10 @@
+preprepare (0.9-1) unstable; urgency=medium
+
+  * Team upload to Debian with PostgreSQL 10 support.
+  * New upstream release.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Wed, 27 Sep 2017 13:05:36 +0200
+
 preprepare (0.8-1) unstable; urgency=medium
 
   * New upstream release with 9.6 support.

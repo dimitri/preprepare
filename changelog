@@ -1,3 +1,9 @@
+preprepare (0.9) upstream; urgency=medium
+
+  * Note that custom_variable_classes isn't required anymore.
+
+ -- Christoph Berg <christoph.berg@credativ.de>  Wed, 27 Sep 2017 13:08:43 +0200
+
 preprepare (0.8) upstream; urgency=medium
 
   * Add extra argument to GetConfigOptionByName for 9.6.

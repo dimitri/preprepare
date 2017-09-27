@@ -4,14 +4,14 @@ Priority: extra
 Maintainer: Debian PostgreSQL Maintainers <pkg-postgresql-public@lists.alioth.debian.org>
 Uploaders: Dimitri Fontaine <dim@tapoueh.org>, Christoph Berg <myon@debian.org>
 Build-Depends: debhelper (>= 9), postgresql-server-dev-all (>= 148~)
-Standards-Version: 3.9.6
+Standards-Version: 4.1.0
 Vcs-Browser: https://github.com/dimitri/preprepare
 Vcs-Git: https://github.com/dimitri/preprepare.git -b debian
 XS-Testsuite: autopkgtest
 
-Package: postgresql-9.6-preprepare
+Package: postgresql-10-preprepare
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, postgresql-9.6
+Depends: ${misc:Depends}, ${shlibs:Depends}, postgresql-10
 Description: pre prepare your PostgreSQL statements server side
  The pre_prepare module for PostgreSQL aims to prepare all your statements as
  soon as possible and in a way that allows client queries not to bother at all
