@@ -1,3 +1,9 @@
+preprepare (0.9-2) unstable; urgency=medium
+
+  * Upload for PostgreSQL 11.
+
+ -- Christoph Berg <myon@debian.org>  Sat, 13 Oct 2018 22:52:22 +0200
+
 preprepare (0.9-1) unstable; urgency=medium
 
   * Team upload to Debian with PostgreSQL 10 support.
