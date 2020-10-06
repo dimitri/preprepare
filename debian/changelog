@@ -1,3 +1,12 @@
+preprepare (0.9-4) unstable; urgency=medium
+
+  * Upload for PostgreSQL 13.
+  * Use dh --with pgxs_loop.
+  * DH 13.
+  * debian/tests: Simplify.
+
+ -- Christoph Berg <myon@debian.org>  Tue, 06 Oct 2020 20:45:33 +0200
+
 preprepare (0.9-3) unstable; urgency=medium
 
   * Upload for PostgreSQL 12.

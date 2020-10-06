@@ -1,32 +1,10 @@
 #!/usr/bin/make -f
 
-SRCDIR = $(CURDIR)
-TARGET = $(CURDIR)/debian/preprepare-%v
-PKGVERS = $(shell dpkg-parsechangelog | awk -F '[:-]' '/^Version:/ { print substr($$2, 2) }')
-EXCLUDE = --exclude-vcs --exclude=debian
-
-include /usr/share/postgresql-common/pgxs_debian_control.mk
-.PHONY: debian/control
-clean: debian/control
-
-override_dh_auto_clean:
-	+pg_buildext clean $(SRCDIR) $(TARGET) "$(CFLAGS)"
-	$(MAKE) clean
-
-override_dh_auto_build:
-
-override_dh_auto_install:
-	+pg_buildext loop postgresql-%v-preprepare
-
 override_dh_installdocs:
 	dh_installdocs --all README.asciidoc
 
 override_dh_link:
 	set -ex; for v in $(shell pg_buildext supported-versions); do mkdir debian/postgresql-$$v-preprepare/usr/lib/postgresql/$$v/lib/plugins; ln -s ../pre_prepare.so debian/postgresql-$$v-preprepare/usr/lib/postgresql/$$v/lib/plugins; done
 
-orig: debian/control clean
-	cd .. && tar czf preprepare_$(PKGVERS).orig.tar.gz $(EXCLUDE) preprepare
-
 %:
-	dh $@
-
+	dh $@ --with pgxs_loop
