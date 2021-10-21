@@ -1,3 +1,9 @@
+preprepare (0.9-6) unstable; urgency=medium
+
+  * Upload for PostgreSQL 14.
+
+ -- Christoph Berg <myon@debian.org>  Thu, 21 Oct 2021 11:57:19 +0200
+
 preprepare (0.9-5) unstable; urgency=medium
 
   * R³: no.
