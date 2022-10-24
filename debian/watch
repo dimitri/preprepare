@@ -1,2 +1,2 @@
 version=4
-https://github.com/dimitri/preprepare/releases .*/v(.*).tar.gz
+https://github.com/dimitri/preprepare/tags .*/v(.*).tar.gz
