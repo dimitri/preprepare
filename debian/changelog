@@ -1,10 +1,22 @@
-preprepare (0.9-6) unstable; urgency=medium
+preprepare (0.9-8) unstable; urgency=medium
 
   * Upload for PostgreSQL 16.
   * Use ${postgresql:Depends}.
-  * debian/watch: Look at GitHub tags instead of releases.
 
  -- Christoph Berg <myon@debian.org>  Mon, 18 Sep 2023 22:30:42 +0200
+
+preprepare (0.9-7) unstable; urgency=medium
+
+  * Upload for PostgreSQL 15.
+  * debian/watch: Look at GitHub tags instead of releases.
+
+ -- Christoph Berg <myon@debian.org>  Mon, 24 Oct 2022 17:01:49 +0200
+
+preprepare (0.9-6) unstable; urgency=medium
+
+  * Upload for PostgreSQL 14.
+
+ -- Christoph Berg <myon@debian.org>  Thu, 21 Oct 2021 11:57:19 +0200
 
 preprepare (0.9-5) unstable; urgency=medium
 
