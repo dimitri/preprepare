@@ -2,17 +2,26 @@ Source: preprepare
 Section: database
 Priority: optional
 Maintainer: Debian PostgreSQL Maintainers <team+postgresql@tracker.debian.org>
-Uploaders: Dimitri Fontaine <dim@tapoueh.org>, Christoph Berg <myon@debian.org>
-Build-Depends: debhelper-compat (= 13), postgresql-all (>= 217~),
-Standards-Version: 4.6.2
+Uploaders:
+ Dimitri Fontaine <dim@tapoueh.org>,
+ Christoph Berg <myon@debian.org>,
+Build-Depends:
+ architecture-is-64-bit <!pkg.postgresql.32-bit>,
+ debhelper-compat (= 13),
+ postgresql-all <!nocheck>,
+ postgresql-server-dev-all,
+Standards-Version: 4.7.0
 Rules-Requires-Root: no
 Vcs-Browser: https://github.com/dimitri/preprepare
 Vcs-Git: https://github.com/dimitri/preprepare.git -b debian
 XS-Testsuite: autopkgtest
 
-Package: postgresql-16-preprepare
+Package: postgresql-17-preprepare
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}, ${postgresql:Depends}
+Depends:
+ ${misc:Depends},
+ ${postgresql:Depends},
+ ${shlibs:Depends},
 Description: pre prepare your PostgreSQL statements server side
  The pre_prepare module for PostgreSQL aims to prepare all your statements as
  soon as possible and in a way that allows client queries not to bother at all
