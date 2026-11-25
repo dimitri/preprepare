@@ -1,3 +1,10 @@
+preprepare (0.10) upstream; urgency=medium
+
+  * Move packaging repo to https://salsa.debian.org/postgresql/preprepare.
+  * Remove pre-9.2 compat code.
+
+ -- Christoph Berg <myon@debian.org>  Wed, 25 Nov 2026 22:18:18 +0100
+
 preprepare (0.9) upstream; urgency=medium
 
   * Note that custom_variable_classes isn't required anymore.

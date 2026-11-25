@@ -33,10 +33,6 @@ the given relation must return the names and SQL statements to be prepared.
 
 The statements won't be edited, so must be the all PREPARE stuff.
 
-When running PostgreSQL 9.1 or earlier, an additional setting is required:
-
-  custom_variable_classes = 'preprepare' # only for 9.1 and earlier
-
 === pgbouncer
 
 When using pgbouncer, which is a good idea, consider setting up
@@ -50,23 +46,12 @@ as your +reset_query+...
 
 === local_preload_libraries
 
-==== If you have +8.3+
-
-It's unfortunately not possible to call +SPI_connect()+ from the module
-initialization routine (+_PG_init()+) when called via
-+local_preload_libraries+, it's too much early. So fully transparent
-preparing of user given statement is not possible with the +pre_prepare+
-module, you still have to explicitely call +SELECT prepare_all()+.
-
-==== If running 8.4 or later
-
 To call +SPI_connect()+ in fact what's needed is an opened transaction and a
 current active Snapshot. Both are possible to acquire from within a
 dynamically loaded module, so +preprepare+ is supporting the case.
 
 Update your +postgresql.conf+ to have the following:
 
-  custom_variable_classes = 'preprepare' # only for 9.1 and earlier
   preprepare.at_init  = on
   preprepare.relation = 'preprepare.statements'
 
